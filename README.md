@@ -9,9 +9,20 @@ Binario headless para sincronizar un vault de Obsidian de forma bidireccional us
 
 ```bash
 cargo build --release
-./target/release/livesync-agent init-config
-# edita livesync-agent.toml
+./target/release/livesync-agent setup --config ./livesync-agent.toml
 ./target/release/livesync-agent --config ./livesync-agent.toml sync-once
+```
+
+También puedes usar flags no interactivos:
+
+```bash
+./target/release/livesync-agent setup \
+  --config ./livesync-agent.toml \
+  --yes \
+  --vault-path "$HOME/Obsidian" \
+  --base-url "https://data.example.com" \
+  --database "obsidian" \
+  --username "admin"
 ```
 
 ## Instalación fácil (usuario)

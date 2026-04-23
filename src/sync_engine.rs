@@ -301,7 +301,10 @@ fn short_hash(bytes: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(bytes);
     let h = hasher.finalize();
-    h[..8].iter().map(|b| format!("{:02x}", b)).collect::<String>()
+    h[..8]
+        .iter()
+        .map(|b| format!("{:02x}", b))
+        .collect::<String>()
 }
 
 fn chunk_utf8(input: &str, max_len: usize) -> Vec<String> {

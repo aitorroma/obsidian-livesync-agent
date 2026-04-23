@@ -3,7 +3,11 @@ use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
-#[command(name = "livesync-agent", version, about = "Headless bidirectional vault sync binary")]
+#[command(
+    name = "livesync-agent",
+    version,
+    about = "Headless bidirectional vault sync binary"
+)]
 pub struct Cli {
     /// Path to config TOML.
     #[arg(short, long, default_value = "livesync-agent.toml")]
@@ -15,6 +19,25 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
+    /// Interactive setup wizard: writes config and validates connection.
+    Setup {
+        /// Output config path (default: --config value).
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+        /// Overwrite config file without prompt.
+        #[arg(long, default_value_t = false)]
+        yes: bool,
+        #[arg(long)]
+        vault_path: Option<PathBuf>,
+        #[arg(long)]
+        base_url: Option<String>,
+        #[arg(long)]
+        database: Option<String>,
+        #[arg(long)]
+        username: Option<String>,
+        #[arg(long)]
+        password: Option<String>,
+    },
     /// Generate an example config file.
     InitConfig {
         #[arg(short, long)]

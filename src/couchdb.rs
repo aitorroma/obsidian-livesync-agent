@@ -1,9 +1,9 @@
 use anyhow::{anyhow, Result};
+use base64::engine::general_purpose::STANDARD as B64;
+use base64::Engine as _;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use base64::Engine as _;
-use base64::engine::general_purpose::STANDARD as B64;
 
 use crate::config::CouchDbConfig;
 

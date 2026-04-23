@@ -52,7 +52,14 @@ pub fn write_example_config(path: &Path) -> Result<()> {
         },
     };
 
-    let toml = toml::to_string_pretty(&sample)?;
+    write_config(path, &sample)
+}
+
+pub fn write_config(path: &Path, cfg: &AgentConfig) -> Result<()> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    let toml = toml::to_string_pretty(cfg)?;
     fs::write(path, toml)?;
     Ok(())
 }

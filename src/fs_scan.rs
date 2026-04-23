@@ -15,10 +15,13 @@ pub struct FileSnapshot {
     pub sha256: String,
 }
 
-pub async fn scan_vault(vault_root: &Path, ignore_prefixes: &[String]) -> Result<BTreeMap<String, FileSnapshot>> {
-    let root = vault_root.canonicalize().with_context(|| {
-        format!("failed to resolve vault path: {}", vault_root.display())
-    })?;
+pub async fn scan_vault(
+    vault_root: &Path,
+    ignore_prefixes: &[String],
+) -> Result<BTreeMap<String, FileSnapshot>> {
+    let root = vault_root
+        .canonicalize()
+        .with_context(|| format!("failed to resolve vault path: {}", vault_root.display()))?;
 
     let mut files = BTreeMap::new();
 

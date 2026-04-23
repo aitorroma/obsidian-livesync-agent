@@ -2,6 +2,7 @@ mod cli;
 mod config;
 mod couchdb;
 mod fs_scan;
+mod setup;
 mod state;
 mod sync_engine;
 
@@ -14,6 +15,7 @@ use tracing::{error, info};
 
 use crate::cli::{Cli, Commands};
 use crate::config::AgentConfig;
+use crate::setup::SetupParams;
 use crate::sync_engine::SyncEngine;
 
 #[tokio::main]
@@ -27,6 +29,29 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
+        Commands::Setup {
+            output,
+            yes,
+            vault_path,
+            base_url,
+            database,
+            username,
+            password,
+        } => {
+            setup::run_setup(
+                SetupParams {
+                    output,
+                    yes,
+                    vault_path,
+                    base_url,
+                    database,
+                    username,
+                    password,
+                },
+                cli.config.clone(),
+            )
+            .await
+        }
         Commands::InitConfig { output } => {
             let path = output.unwrap_or_else(|| PathBuf::from("livesync-agent.toml"));
             config::write_example_config(&path)?;
