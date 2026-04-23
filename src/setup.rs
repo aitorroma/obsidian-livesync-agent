@@ -34,17 +34,17 @@ pub async fn run_setup(params: SetupParams, default_config: PathBuf) -> Result<(
 
     let vault_path = match params.vault_path {
         Some(v) => v,
-        None => PathBuf::from(prompt_required("Vault path", "/home/user/Obsidian")?),
+        None => PathBuf::from(prompt_with_default("Vault path", &default_vault_path())?),
     };
 
     let base_url = match params.base_url {
         Some(v) => v,
-        None => prompt_required("CouchDB base URL", "https://couchdb.example.com")?,
+        None => prompt_with_default("CouchDB base URL", "https://couchdb.example.com")?,
     };
 
     let database = match params.database {
         Some(v) => v,
-        None => prompt_required("CouchDB database", "obsidian")?,
+        None => prompt_with_default("CouchDB database", "obsidian")?,
     };
 
     let username = match params.username {
@@ -101,18 +101,22 @@ pub async fn run_setup(params: SetupParams, default_config: PathBuf) -> Result<(
     Ok(())
 }
 
-fn prompt_required(label: &str, example: &str) -> Result<String> {
-    loop {
-        print!("{} [{}]: ", label, example);
-        io::stdout().flush()?;
-        let mut buf = String::new();
-        io::stdin().read_line(&mut buf)?;
-        let value = buf.trim().to_string();
-        if !value.is_empty() {
-            return Ok(value);
-        }
-        println!("Value required.");
+fn default_vault_path() -> String {
+    std::env::var("HOME")
+        .map(|h| format!("{h}/Obsidian"))
+        .unwrap_or_else(|_| "/home/user/Obsidian".to_string())
+}
+
+fn prompt_with_default(label: &str, default: &str) -> Result<String> {
+    print!("{} [{}]: ", label, default);
+    io::stdout().flush()?;
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf)?;
+    let value = buf.trim().to_string();
+    if value.is_empty() {
+        return Ok(default.to_string());
     }
+    Ok(value)
 }
 
 fn prompt_optional(label: &str) -> Result<String> {
