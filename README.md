@@ -94,6 +94,12 @@ Or daemon mode:
 livesync-agent daemon --interval-seconds 30
 ```
 
+Install as systemd user service (and start immediately):
+
+```bash
+livesync-agent daemon --interval-seconds 30 --install
+```
+
 ## Releases
 
 GitHub Actions release workflow:

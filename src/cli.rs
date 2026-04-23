@@ -56,5 +56,8 @@ pub enum Commands {
     Daemon {
         #[arg(short, long, default_value_t = 30)]
         interval_seconds: u64,
+        /// Install and start a systemd --user service instead of running in foreground.
+        #[arg(long, default_value_t = false)]
+        install: bool,
     },
 }

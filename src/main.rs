@@ -5,6 +5,7 @@ mod fs_scan;
 mod setup;
 mod state;
 mod sync_engine;
+mod systemd;
 
 use std::path::PathBuf;
 use std::time::Duration;
@@ -63,7 +64,13 @@ async fn main() -> Result<()> {
             let mut engine = SyncEngine::new(config).await?;
             engine.sync_once().await
         }
-        Commands::Daemon { interval_seconds } => {
+        Commands::Daemon {
+            interval_seconds,
+            install,
+        } => {
+            if install {
+                return systemd::install_user_service(&cli.config, interval_seconds);
+            }
             let config = AgentConfig::load(&cli.config)?;
             let mut engine = SyncEngine::new(config).await?;
             let tick = Duration::from_secs(interval_seconds.max(5));
