@@ -75,19 +75,21 @@ cargo build --release
 Setup interactivo:
 
 ```bash
-livesync-agent setup --config ~/.livesync-agent/config.toml
+livesync-agent setup
 ```
+
+Ruta de config por defecto: `~/.livesync-agent/config.toml` (la carpeta se crea automáticamente).
 
 Ejecutar un ciclo:
 
 ```bash
-livesync-agent --config ~/.livesync-agent/config.toml sync-once
+livesync-agent sync-once
 ```
 
 Modo daemon:
 
 ```bash
-livesync-agent --config ~/.livesync-agent/config.toml daemon --interval-seconds 30
+livesync-agent daemon --interval-seconds 30
 ```
 
 ## Releases

@@ -10,11 +10,18 @@ use clap::{Parser, Subcommand};
 )]
 pub struct Cli {
     /// Path to config TOML.
-    #[arg(short, long, default_value = "livesync-agent.toml")]
+    #[arg(short, long, global = true, default_value_os_t = default_config_path())]
     pub config: PathBuf,
 
     #[command(subcommand)]
     pub command: Commands,
+}
+
+fn default_config_path() -> PathBuf {
+    std::env::var_os("HOME")
+        .map(PathBuf::from)
+        .map(|p| p.join(".livesync-agent").join("config.toml"))
+        .unwrap_or_else(|| PathBuf::from(".livesync-agent/config.toml"))
 }
 
 #[derive(Subcommand, Debug)]
