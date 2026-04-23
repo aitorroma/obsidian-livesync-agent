@@ -17,7 +17,7 @@
 
 # livesync-agent
 
-Headless Linux agent to sync Obsidian vaults bidirectionally using CouchDB.
+Headless agent to sync Obsidian vaults bidirectionally using CouchDB (Linux/macOS).
 
 > 🇪🇸 Spanish docs: [README_es.md](./README_es.md)
 
@@ -44,7 +44,7 @@ docker stack deploy -c deploy/couchdb.yaml couchdb
 
 ## 2) Install livesync-agent
 
-### Option A: release installer script (Linux x86_64)
+### Option A: release installer script (Linux x86_64 + macOS Intel/Apple Silicon)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/aitorroma/obsidian-livesync-agent/main/scripts/install.sh | bash
@@ -99,7 +99,7 @@ livesync-agent daemon --interval-seconds 30
 GitHub Actions release workflow:
 - File: `.github/workflows/release.yml`
 - Trigger: push tag `v*` (example: `v0.1.1`)
-- Build target: **Linux x86_64 only**
+- Build targets: **macOS Intel + Apple Silicon**
 
 Create release:
 
@@ -109,5 +109,6 @@ git push origin v0.1.1
 ```
 
 Assets uploaded:
-- `livesync-agent-<tag>-x86_64-unknown-linux-gnu.tar.gz`
+- `livesync-agent-<tag>-x86_64-apple-darwin.tar.gz`
+- `livesync-agent-<tag>-aarch64-apple-darwin.tar.gz`
 - `SHA256SUMS`

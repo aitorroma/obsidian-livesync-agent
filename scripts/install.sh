@@ -8,7 +8,7 @@ VERSION="latest"
 
 usage() {
   cat <<USAGE
-Install livesync-agent from GitHub Releases (Linux x86_64).
+Install livesync-agent from GitHub Releases (macOS + Linux x86_64).
 
 Usage:
   $0 [options]
@@ -45,17 +45,28 @@ done
 os="$(uname -s | tr '[:upper:]' '[:lower:]')"
 arch="$(uname -m)"
 
-if [[ "$os" != "linux" ]]; then
-  echo "This installer currently supports Linux only." >&2
-  exit 1
-fi
+case "$arch" in
+  x86_64|amd64) arch="x86_64" ;;
+  arm64|aarch64) arch="aarch64" ;;
+  *) echo "Unsupported architecture: $arch" >&2; exit 1 ;;
+esac
 
-if [[ "$arch" != "x86_64" && "$arch" != "amd64" ]]; then
-  echo "This installer currently supports Linux x86_64 only." >&2
-  exit 1
-fi
-
-target="x86_64-unknown-linux-gnu"
+case "$os" in
+  linux)
+    if [[ "$arch" != "x86_64" ]]; then
+      echo "Linux installer currently supports x86_64 only." >&2
+      exit 1
+    fi
+    target="x86_64-unknown-linux-gnu"
+    ;;
+  darwin)
+    target="${arch}-apple-darwin"
+    ;;
+  *)
+    echo "Unsupported OS: $os" >&2
+    exit 1
+    ;;
+esac
 archive_ext="tar.gz"
 bin_file="$BIN_NAME"
 
