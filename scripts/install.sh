@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO="${LIVESYNC_AGENT_REPO:-aitorroma/obsidian-livesync}"
+REPO="${LIVESYNC_AGENT_REPO:-aitorroma/obsidian-livesync-agent}"
 BIN_NAME="livesync-agent"
 INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
 VERSION="latest"
@@ -16,11 +16,11 @@ Usage:
 Options:
   --version <tag>      Release tag to install (default: latest)
   --install-dir <dir>  Install directory (default: ~/.local/bin)
-  --repo <owner/name>  GitHub repo (default: aitorroma/obsidian-livesync)
+  --repo <owner/name>  GitHub repo (default: aitorroma/obsidian-livesync-agent)
   -h, --help           Show this help
 
 Examples:
-  curl -fsSL https://raw.githubusercontent.com/aitorroma/obsidian-livesync/main/scripts/install.sh | bash
+  curl -fsSL https://raw.githubusercontent.com/aitorroma/obsidian-livesync-agent/main/scripts/install.sh | bash
   $0 --version v0.1.0
 USAGE
 }

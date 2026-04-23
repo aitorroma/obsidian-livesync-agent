@@ -47,7 +47,7 @@ docker stack deploy -c deploy/couchdb.yaml couchdb
 ### Option A: release installer script (Linux x86_64)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/aitorroma/obsidian-livesync/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/aitorroma/obsidian-livesync-agent/main/scripts/install.sh | bash
 ```
 
 ### Option B: Homebrew
@@ -55,14 +55,14 @@ curl -fsSL https://raw.githubusercontent.com/aitorroma/obsidian-livesync/main/sc
 Tap and install:
 
 ```bash
-brew tap aitorroma/obsidian-livesync https://github.com/aitorroma/obsidian-livesync
+brew tap aitorroma/obsidian-livesync-agent https://github.com/aitorroma/obsidian-livesync-agent
 brew install livesync-agent
 ```
 
 Install latest `main` version:
 
 ```bash
-brew install --HEAD aitorroma/obsidian-livesync/livesync-agent
+brew install --HEAD aitorroma/obsidian-livesync-agent/livesync-agent
 ```
 
 ### Option C: from source
