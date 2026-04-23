@@ -17,7 +17,7 @@
 
 # livesync-agent
 
-Agente headless que sincroniza vaults de Obsidian en modo bidireccional usando CouchDB (Linux/macOS).
+Agente headless que sincroniza vaults de Obsidian en modo bidireccional usando CouchDB.
 
 > 🇬🇧 Documentación en inglés: [README.md](./README.md)
 
@@ -44,20 +44,20 @@ docker stack deploy -c deploy/couchdb.yaml couchdb
 
 ## 2) Instalar livesync-agent
 
-### Opción A: script de instalación por release (Linux x86_64 + macOS Intel/Apple Silicon)
+### Opción A: script de instalación por release (Linux x86_64)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/aitorroma/obsidian-livesync-agent/main/scripts/install.sh | bash
 ```
 
-### Opción B: Homebrew
+### Opción B: Homebrew (macOS/Linux, compila desde código fuente)
 
 ```bash
 brew tap aitorroma/obsidian-livesync-agent https://github.com/aitorroma/obsidian-livesync-agent
 brew install livesync-agent
 ```
 
-Para instalar la versión más reciente de `main`:
+Para instalar la versión más reciente de `main` (build desde source):
 
 ```bash
 brew install --HEAD aitorroma/obsidian-livesync-agent/livesync-agent
@@ -97,7 +97,7 @@ livesync-agent daemon --interval-seconds 30
 Workflow de release en GitHub Actions:
 - Fichero: `.github/workflows/release.yml`
 - Trigger: push de tag `v*` (ejemplo: `v0.1.1`)
-- Build targets: **macOS Intel + Apple Silicon**
+- Build target: **solo Linux x86_64**
 
 Crear una release:
 
@@ -107,6 +107,5 @@ git push origin v0.1.1
 ```
 
 Assets publicados:
-- `livesync-agent-<tag>-x86_64-apple-darwin.tar.gz`
-- `livesync-agent-<tag>-aarch64-apple-darwin.tar.gz`
+- `livesync-agent-<tag>-x86_64-unknown-linux-gnu.tar.gz`
 - `SHA256SUMS`
