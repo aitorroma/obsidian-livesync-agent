@@ -3,8 +3,8 @@ class LivesyncAgent < Formula
   homepage "https://github.com/aitorroma/obsidian-livesync-agent"
   license "MIT"
 
-  url "https://github.com/aitorroma/obsidian-livesync-agent/archive/refs/tags/v0.1.2.tar.gz"
-  sha256 "e35c3ad19244adbe6850b900ba10d179f682837f21e3ff5ded81428dcf07988a"
+  url "https://github.com/aitorroma/obsidian-livesync-agent/archive/refs/tags/v0.1.3.tar.gz"
+  sha256 "1ae168f0f6ee7c29b23814bd424aa1cd95b5199df7ab69bc5131a0c0d082c94b"
 
   head "https://github.com/aitorroma/obsidian-livesync-agent.git", branch: "main"
 
