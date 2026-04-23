@@ -13,6 +13,20 @@ cargo build --release
 ./target/release/livesync-agent --config ./livesync-agent.toml sync-once
 ```
 
+## Instalación desde release (sin Rust)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/aitorroma/obsidian-livesync/main/scripts/install.sh | bash
+```
+
+Instalar una versión concreta:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/aitorroma/obsidian-livesync/main/scripts/install.sh | bash -s -- --version v0.1.0
+```
+
+El binario se instala por defecto en `~/.local/bin/livesync-agent`.
+
 También puedes usar flags no interactivos:
 
 ```bash
@@ -113,3 +127,15 @@ password = "secret"
 - reconstruye archivos locales desde remoto.
 - sube cambios locales y borrados.
 - guarda checkpoint en `.livesync-agent/state.json`.
+
+## Releases automáticas
+
+Hay workflow en `.github/workflows/release.yml`:
+
+- Trigger: push de tags `v*` (por ejemplo `v0.1.0`)
+- Build multi-plataforma:
+  - Linux x86_64
+  - macOS x86_64
+  - macOS arm64
+  - Windows x86_64
+- Publica assets + `SHA256SUMS` en GitHub Releases.
