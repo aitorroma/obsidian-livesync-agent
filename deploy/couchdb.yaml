@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+  couchdb:
+    image: couchdb:3.3.3
+    environment:
+      COUCHDB_USER_FILE: /run/secrets/couchdb_user
+      COUCHDB_PASSWORD_FILE: /run/secrets/couchdb_password
+    secrets:
+      - couchdb_user
+      - couchdb_password
+    volumes:
+      - couchdb_data:/opt/couchdb/data
+    networks:
+      - proxy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:5984/_up || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=proxy
+
+        # HTTPS router
+        - traefik.http.routers.couchdb.rule=Host(`data.citaspro.cloud`)
+        - traefik.http.routers.couchdb.entrypoints=websecure
+        - traefik.http.routers.couchdb.tls=true
+        - traefik.http.routers.couchdb.tls.certresolver=letsencryptresolver
+
+        # Backend port
+        - traefik.http.services.couchdb.loadbalancer.server.port=5984
+
+        # Security headers middleware
+        - traefik.http.middlewares.couchdb-secure.headers.stsSeconds=31536000
+        - traefik.http.middlewares.couchdb-secure.headers.stsIncludeSubdomains=true
+        - traefik.http.middlewares.couchdb-secure.headers.stsPreload=true
+        - traefik.http.middlewares.couchdb-secure.headers.contentTypeNosniff=true
+        - traefik.http.middlewares.couchdb-secure.headers.browserXssFilter=true
+        - traefik.http.middlewares.couchdb-secure.headers.frameDeny=true
+        - traefik.http.routers.couchdb.middlewares=couchdb-secure@docker
+
+volumes:
+  couchdb_data:
+
+networks:
+  proxy:
+    external: true
+
+secrets:
+  couchdb_user:
+    external: true
+  couchdb_password:
+    external: true
