@@ -17,76 +17,74 @@
 
 # livesync-agent
 
-Headless Linux agent to sync Obsidian vaults bidirectionally using CouchDB.
+Agente headless para Linux que sincroniza vaults de Obsidian en modo bidireccional usando CouchDB.
 
-> 🇪🇸 Spanish docs: [README_es.md](./README_es.md)
+> 🇬🇧 Documentación en inglés: [README.md](./README.md)
 
-## 0) Install the Obsidian plugin first
+## 0) Instala primero el plugin de Obsidian
 
-This agent is designed to work with **Self-hosted LiveSync**.
+Este agente está pensado para funcionar con **Self-hosted LiveSync**.
 
-Install plugin in Obsidian from:
+Instalación del plugin:
 - https://obsidian.md/es/plugins?search=Self-hosted%20LiveSync
 
-## 1) Deploy CouchDB with HTTPS (Traefik + Swarm)
+## 1) Despliega CouchDB con HTTPS (Traefik + Swarm)
 
-Use the included stack:
+Usa los ficheros incluidos:
 - `deploy/couchdb.yaml`
 - `deploy/README.md`
 
-Quick deploy:
+Despliegue rápido:
 
 ```bash
 printf 'admin' | docker secret create couchdb_user -
-printf 'CHANGE_ME_STRONG_PASSWORD' | docker secret create couchdb_password -
+printf 'CAMBIA_A_PASSWORD_SEGURA' | docker secret create couchdb_password -
 docker stack deploy -c deploy/couchdb.yaml couchdb
 ```
 
-## 2) Install livesync-agent
+## 2) Instalar livesync-agent
 
-### Option A: release installer script (Linux x86_64)
+### Opción A: script de instalación por release (Linux x86_64)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/aitorroma/obsidian-livesync/main/scripts/install.sh | bash
 ```
 
-### Option B: Homebrew
-
-Tap and install:
+### Opción B: Homebrew
 
 ```bash
 brew tap aitorroma/obsidian-livesync https://github.com/aitorroma/obsidian-livesync
 brew install livesync-agent
 ```
 
-Install latest `main` version:
+Para instalar la versión más reciente de `main`:
 
 ```bash
 brew install --HEAD aitorroma/obsidian-livesync/livesync-agent
 ```
 
-### Option C: from source
+### Opción C: compilar desde código fuente
 
 ```bash
 cargo build --release
 ./target/release/livesync-agent --help
 ```
 
-## 3) Configure
+## 3) Configuración
 
-Interactive setup:
+Setup interactivo:
 
 ```bash
 livesync-agent setup --config ~/.livesync-agent/config.toml
 ```
 
-Then run one cycle:
+Ejecutar un ciclo:
 
 ```bash
 livesync-agent --config ~/.livesync-agent/config.toml sync-once
 ```
 
-Or daemon mode:
+Modo daemon:
 
 ```bash
 livesync-agent --config ~/.livesync-agent/config.toml daemon --interval-seconds 30
@@ -94,18 +92,18 @@ livesync-agent --config ~/.livesync-agent/config.toml daemon --interval-seconds 
 
 ## Releases
 
-GitHub Actions release workflow:
-- File: `.github/workflows/release.yml`
-- Trigger: push tag `v*` (example: `v0.1.1`)
-- Build target: **Linux x86_64 only**
+Workflow de release en GitHub Actions:
+- Fichero: `.github/workflows/release.yml`
+- Trigger: push de tag `v*` (ejemplo: `v0.1.1`)
+- Build target: **solo Linux x86_64**
 
-Create release:
+Crear una release:
 
 ```bash
 git tag v0.1.1
 git push origin v0.1.1
 ```
 
-Assets uploaded:
+Assets publicados:
 - `livesync-agent-<tag>-x86_64-unknown-linux-gnu.tar.gz`
 - `SHA256SUMS`

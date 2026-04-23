@@ -9,29 +9,9 @@ permissions:
   contents: write
 
 jobs:
-  build:
-    name: Build ${{ matrix.target }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            archive_ext: tar.gz
-            exe_ext: ""
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            archive_ext: zip
-            exe_ext: ".exe"
-          - os: macos-13
-            target: x86_64-apple-darwin
-            archive_ext: tar.gz
-            exe_ext: ""
-          - os: macos-14
-            target: aarch64-apple-darwin
-            archive_ext: tar.gz
-            exe_ext: ""
+  build-linux:
+    name: Build Linux x86_64
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -40,13 +20,13 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: x86_64-unknown-linux-gnu
 
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
 
       - name: Build
-        run: cargo build --release --locked --target ${{ matrix.target }}
+        run: cargo build --release --locked --target x86_64-unknown-linux-gnu
 
       - name: Package
         shell: bash
@@ -54,34 +34,25 @@ jobs:
           set -euo pipefail
           BIN_NAME="livesync-agent"
           VERSION="${GITHUB_REF_NAME}"
-          TARGET="${{ matrix.target }}"
-          EXE_EXT="${{ matrix.exe_ext }}"
-          ARCHIVE_EXT="${{ matrix.archive_ext }}"
+          TARGET="x86_64-unknown-linux-gnu"
           ASSET_BASE="${BIN_NAME}-${VERSION}-${TARGET}"
 
           mkdir -p dist
-          cp "target/${TARGET}/release/${BIN_NAME}${EXE_EXT}" "dist/${BIN_NAME}${EXE_EXT}"
-
-          if [[ "$ARCHIVE_EXT" == "zip" ]]; then
-            (cd dist && 7z a -tzip "${ASSET_BASE}.zip" "${BIN_NAME}${EXE_EXT}" >/dev/null)
-            rm -f "dist/${BIN_NAME}${EXE_EXT}"
-            (cd dist && sha256sum "${ASSET_BASE}.zip" > "${ASSET_BASE}.sha256")
-          else
-            tar -C dist -czf "dist/${ASSET_BASE}.tar.gz" "${BIN_NAME}${EXE_EXT}"
-            rm -f "dist/${BIN_NAME}${EXE_EXT}"
-            (cd dist && shasum -a 256 "${ASSET_BASE}.tar.gz" | awk '{print $1"  "$2}' > "${ASSET_BASE}.sha256")
-          fi
+          cp "target/${TARGET}/release/${BIN_NAME}" "dist/${BIN_NAME}"
+          tar -C dist -czf "dist/${ASSET_BASE}.tar.gz" "${BIN_NAME}"
+          rm -f "dist/${BIN_NAME}"
+          (cd dist && sha256sum "${ASSET_BASE}.tar.gz" > "${ASSET_BASE}.sha256")
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: release-${{ matrix.target }}
+          name: release-linux
           path: dist/*
 
   release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-linux
 
     steps:
       - name: Download build artifacts
@@ -104,5 +75,4 @@ jobs:
           generate_release_notes: true
           files: |
             dist/*.tar.gz
-            dist/*.zip
             dist/SHA256SUMS

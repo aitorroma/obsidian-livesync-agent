@@ -8,7 +8,7 @@ VERSION="latest"
 
 usage() {
   cat <<USAGE
-Install livesync-agent from GitHub Releases.
+Install livesync-agent from GitHub Releases (Linux x86_64).
 
 Usage:
   $0 [options]
@@ -45,33 +45,19 @@ done
 os="$(uname -s | tr '[:upper:]' '[:lower:]')"
 arch="$(uname -m)"
 
-case "$arch" in
-  x86_64|amd64) arch="x86_64" ;;
-  arm64|aarch64) arch="aarch64" ;;
-  *) echo "Unsupported architecture: $arch" >&2; exit 1 ;;
-esac
+if [[ "$os" != "linux" ]]; then
+  echo "This installer currently supports Linux only." >&2
+  exit 1
+fi
 
-case "$os" in
-  linux)
-    target="${arch}-unknown-linux-gnu"
-    archive_ext="tar.gz"
-    bin_file="$BIN_NAME"
-    ;;
-  darwin)
-    target="${arch}-apple-darwin"
-    archive_ext="tar.gz"
-    bin_file="$BIN_NAME"
-    ;;
-  msys*|mingw*|cygwin*)
-    target="x86_64-pc-windows-msvc"
-    archive_ext="zip"
-    bin_file="${BIN_NAME}.exe"
-    ;;
-  *)
-    echo "Unsupported OS: $os" >&2
-    exit 1
-    ;;
-esac
+if [[ "$arch" != "x86_64" && "$arch" != "amd64" ]]; then
+  echo "This installer currently supports Linux x86_64 only." >&2
+  exit 1
+fi
+
+target="x86_64-unknown-linux-gnu"
+archive_ext="tar.gz"
+bin_file="$BIN_NAME"
 
 if [[ "$VERSION" == "latest" ]]; then
   VERSION="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -n1)"
@@ -102,32 +88,13 @@ if [[ -z "$expected_line" ]]; then
   exit 1
 fi
 
-if command -v sha256sum >/dev/null 2>&1; then
-  (cd "$tmp_dir" && echo "$expected_line" | sha256sum -c -)
-elif command -v shasum >/dev/null 2>&1; then
-  expected_hash="$(echo "$expected_line" | awk '{print $1}')"
-  actual_hash="$(shasum -a 256 "$tmp_dir/$asset" | awk '{print $1}')"
-  [[ "$expected_hash" == "$actual_hash" ]] || { echo "Checksum mismatch" >&2; exit 1; }
-else
-  echo "Neither sha256sum nor shasum found for checksum validation" >&2
-  exit 1
-fi
+(cd "$tmp_dir" && echo "$expected_line" | sha256sum -c -)
 
 mkdir -p "$tmp_dir/unpack"
-if [[ "$archive_ext" == "zip" ]]; then
-  if ! command -v unzip >/dev/null 2>&1; then
-    echo "unzip is required to install zip archives" >&2
-    exit 1
-  fi
-  unzip -q "$tmp_dir/$asset" -d "$tmp_dir/unpack"
-else
-  tar -xzf "$tmp_dir/$asset" -C "$tmp_dir/unpack"
-fi
+tar -xzf "$tmp_dir/$asset" -C "$tmp_dir/unpack"
 
 mkdir -p "$INSTALL_DIR"
 install -m 0755 "$tmp_dir/unpack/$bin_file" "$INSTALL_DIR/$bin_file"
 
 echo "Installed: $INSTALL_DIR/$bin_file"
-if [[ "$os" != msys* && "$os" != mingw* && "$os" != cygwin* ]]; then
-  echo "Run: $INSTALL_DIR/$bin_file --help"
-fi
+echo "Run: $INSTALL_DIR/$bin_file --help"
