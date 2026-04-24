@@ -17,6 +17,7 @@ Options:
   --version <tag>      Release tag to install (default: latest)
   --install-dir <dir>  Install directory (default: ~/.local/bin)
   --repo <owner/name>  GitHub repo (default: aitorroma/obsidian-livesync-agent)
+  --target <triple>    Asset target override (default: auto; prefers musl)
   -h, --help           Show this help
 
 Examples:
@@ -33,6 +34,8 @@ while [[ $# -gt 0 ]]; do
       INSTALL_DIR="$2"; shift 2 ;;
     --repo)
       REPO="$2"; shift 2 ;;
+    --target)
+      target="$2"; shift 2 ;;
     -h|--help)
       usage; exit 0 ;;
     *)
@@ -56,7 +59,7 @@ if [[ "$arch" != "x86_64" && "$arch" != "amd64" ]]; then
   exit 1
 fi
 
-target="x86_64-unknown-linux-gnu"
+target="${target:-auto}"
 archive_ext="tar.gz"
 bin_file="$BIN_NAME"
 
@@ -68,20 +71,43 @@ if [[ "$VERSION" == "latest" ]]; then
   fi
 fi
 
-asset="${BIN_NAME}-${VERSION}-${target}.${archive_ext}"
 base_url="https://github.com/${REPO}/releases/download/${VERSION}"
-asset_url="${base_url}/${asset}"
 checksums_url="${base_url}/SHA256SUMS"
 
 tmp_dir="$(mktemp -d)"
 cleanup() { rm -rf "$tmp_dir"; }
 trap cleanup EXIT
 
-echo "Downloading ${asset} ..."
-curl -fL "$asset_url" -o "$tmp_dir/$asset"
-
 echo "Downloading SHA256SUMS ..."
 curl -fL "$checksums_url" -o "$tmp_dir/SHA256SUMS"
+
+if [[ "$target" == "auto" ]]; then
+  candidate_targets=(
+    "x86_64-unknown-linux-musl"
+    "x86_64-unknown-linux-gnu"
+  )
+else
+  candidate_targets=("$target")
+fi
+
+asset=""
+for candidate_target in "${candidate_targets[@]}"; do
+  candidate_asset="${BIN_NAME}-${VERSION}-${candidate_target}.${archive_ext}"
+  if grep -q "  ${candidate_asset}$" "$tmp_dir/SHA256SUMS"; then
+    target="$candidate_target"
+    asset="$candidate_asset"
+    break
+  fi
+done
+
+if [[ -z "$asset" ]]; then
+  echo "No compatible asset found in release ${VERSION} for targets: ${candidate_targets[*]}" >&2
+  exit 1
+fi
+
+asset_url="${base_url}/${asset}"
+echo "Downloading ${asset} ..."
+curl -fL "$asset_url" -o "$tmp_dir/$asset"
 
 expected_line="$(grep "  ${asset}$" "$tmp_dir/SHA256SUMS" || true)"
 if [[ -z "$expected_line" ]]; then

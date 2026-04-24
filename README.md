@@ -105,7 +105,7 @@ livesync-agent daemon --interval-seconds 30 --install
 GitHub Actions release workflow:
 - File: `.github/workflows/release.yml`
 - Trigger: push tag `v*` (example: `v0.1.1`)
-- Build target: **Linux x86_64 only**
+- Build targets: **Linux x86_64 (musl + gnu)**
 
 Create release:
 
@@ -115,5 +115,6 @@ git push origin v0.1.1
 ```
 
 Assets uploaded:
+- `livesync-agent-<tag>-x86_64-unknown-linux-musl.tar.gz` (portable, preferred by installer)
 - `livesync-agent-<tag>-x86_64-unknown-linux-gnu.tar.gz`
 - `SHA256SUMS`
