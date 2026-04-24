@@ -6,6 +6,40 @@ BIN_NAME="livesync-agent"
 INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
 VERSION="latest"
 
+ensure_install_dir_in_path() {
+  case ":$PATH:" in
+    *":$INSTALL_DIR:"*) return 0 ;;
+  esac
+
+  local export_line="export PATH=\"$INSTALL_DIR:\$PATH\""
+  local marker="# Added by livesync-agent installer"
+  local shell_name profile_file
+  shell_name="$(basename "${SHELL:-}")"
+
+  case "$shell_name" in
+    bash) profile_file="$HOME/.bashrc" ;;
+    zsh) profile_file="$HOME/.zshrc" ;;
+    *) profile_file="$HOME/.profile" ;;
+  esac
+
+  if [[ ! -e "$profile_file" ]]; then
+    : > "$profile_file"
+  fi
+
+  if grep -Fq "$export_line" "$profile_file"; then
+    return 0
+  fi
+
+  {
+    echo ""
+    echo "$marker"
+    echo "$export_line"
+  } >> "$profile_file"
+
+  echo "Added $INSTALL_DIR to PATH in $profile_file"
+  echo "Reload shell: source $profile_file"
+}
+
 usage() {
   cat <<USAGE
 Install livesync-agent from GitHub Releases (Linux x86_64).
@@ -122,6 +156,7 @@ tar -xzf "$tmp_dir/$asset" -C "$tmp_dir/unpack"
 
 mkdir -p "$INSTALL_DIR"
 install -m 0755 "$tmp_dir/unpack/$bin_file" "$INSTALL_DIR/$bin_file"
+ensure_install_dir_in_path
 
 echo "Installed: $INSTALL_DIR/$bin_file"
 echo "Run: $INSTALL_DIR/$bin_file --help"
