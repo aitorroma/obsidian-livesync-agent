@@ -100,6 +100,19 @@ Install as systemd user service (and start immediately):
 livesync-agent daemon --interval-seconds 30 --install
 ```
 
+If you're in a non-interactive shell (for example `su -` or some containers), auto-start may fail because the user session bus is unavailable. In that case the service file is still installed and you can enable it later from a normal login session:
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now livesync-agent.service
+```
+
+Headless server tip (one-time):
+
+```bash
+sudo loginctl enable-linger $USER
+```
+
 ## Releases
 
 GitHub Actions release workflow:

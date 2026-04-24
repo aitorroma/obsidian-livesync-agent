@@ -98,6 +98,19 @@ Instalar como servicio systemd de usuario (y arrancar al momento):
 livesync-agent daemon --interval-seconds 30 --install
 ```
 
+Si estás en una shell no interactiva (por ejemplo `su -` o algunos contenedores), el autoarranque puede fallar porque no hay bus de sesión de usuario. En ese caso el fichero del servicio queda instalado y puedes habilitarlo después desde una sesión de login normal:
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now livesync-agent.service
+```
+
+Tip para servidores headless (una sola vez):
+
+```bash
+sudo loginctl enable-linger $USER
+```
+
 ## Releases
 
 Workflow de release en GitHub Actions:
